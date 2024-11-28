@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RuleUP@Bot - Universidad de Pamplona</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+    <!-- Modal de consentimiento -->
+    <div id="consentModal" class="modal">
+        <div class="modal-content">
+            <h2>Aviso Importante</h2>
+            <p>El siguiente chat es de carácter informativo. Las respuestas proporcionadas pueden contener errores y no tienen implicaciones jurídicas. Para información oficial y vinculante, te recomendamos contactar directamente con la Universidad de Pamplona.</p>
+            <p>Al continuar, aceptas que el uso de este chat es bajo tu propia responsabilidad.</p>
+            <button id="acceptConsent">Aceptar</button>
+            <button id="declineConsent">Rechazar</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="encabezado">
+            <img class="escudo" src="{{ url_for('static', filename='assets/escudounipamplona.png') }}" alt="Escudo unipamplona">
+            <h1>RuleUP@Bot <br><span class="unip">Unipamplona</span></h1>
+        </div>
+        <p>Haz tus preguntas sobre el reglamento académico de la Universidad de Pamplona.</p>
+        
+        <div id="chatContainer" class="chat-container" style="display: none;">
+            <!-- Se almacenan las preguntas y respuestas -->
+        </div>
+        
+        <form id="questionForm">
+            <label for="question">Escribe tu pregunta:</label>
+            <input type="text" id="question" name="question" placeholder="Ejemplo: ¿Cómo solicitar una constancia de estudios?" required>
+            <button type="submit">Consultar</button>
+        </form>
+    </div>
+
+    <script>
+
+        // Mostrar el modal al cargar la página
+        window.onload = function() {
+            document.getElementById("consentModal").style.display = "flex";
+        };
+
+        // Manejar la aceptación del consentimiento
+        document.getElementById("acceptConsent").onclick = function() {
+            document.getElementById("consentModal").style.display = "none";
+            
+        };
+
+        // Manejar el rechazo del consentimiento
+        document.getElementById("declineConsent").onclick = function() {
+            alert("No es posible acceder al chat sin aceptar los términos. Para más información, contacta con la Universidad.");
+        };
+
+        document.getElementById("questionForm").onsubmit = async (event) => {
+            event.preventDefault();
+            const question = document.getElementById("question").value;
+            
+            // Mostrar el contenedor de chat si está oculto
+            const chatContainer = document.getElementById("chatContainer");
+            if (chatContainer.style.display === "none") {
+                chatContainer.style.display = "flex";
+                chatContainer.style.flexDirection = "column";
+                setTimeout(() => {
+                    chatContainer.style.opacity = "1";
+                }, 10);
+            }
+    
+            // Agregar la pregunta al chat
+            const userQuestion = document.createElement("div");
+            userQuestion.className = "user-message";
+            userQuestion.innerHTML = `<span class="label-user">Tú:</span> ${question}`;
+            chatContainer.appendChild(userQuestion);
+    
+            // Mostrar un mensaje de carga mientras se obtiene la respuesta
+            const loadingMessage = document.createElement("div");
+            loadingMessage.className = "bot-message";
+            loadingMessage.textContent = "Consultando...";
+            chatContainer.appendChild(loadingMessage);
+    
+            // Desplazar el contenedor hacia abajo para ver el mensaje más reciente
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+    
+            // Enviar la pregunta al servidor y obtener la respuesta
+            const response = await fetch("/ask", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams({ "question": question })
+            });
+            const data = await response.json();
+    
+            // Remover el mensaje de carga y mostrar la respuesta
+            chatContainer.removeChild(loadingMessage);
+            const botAnswer = document.createElement("div");
+            botAnswer.className = "bot-message";
+            botAnswer.innerHTML = `<span class="label-bot">RuleUP@Bot:</span> ${data.response}`;
+            chatContainer.appendChild(botAnswer);
+    
+            // Desplazar hacia abajo nuevamente para ver la respuesta más reciente
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+    
+            // Limpiar el campo de entrada
+            document.getElementById("question").value = "";
+        };
+    </script>
+</body>
+</html>
+
