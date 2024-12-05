@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, make_response, render_template, request, jsonify
 from ChatBot import ChatBot  # Se importa la clase ChatBot
 
 app = Flask(__name__)
@@ -6,7 +6,12 @@ bot = ChatBot()  # Se instancia la clase ChatBot
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    #return render_template('index.html')
+    response = make_response(render_template('index.html'))
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '-1'
+    return response
 
 @app.route('/ask', methods=['POST'])
 def ask():
