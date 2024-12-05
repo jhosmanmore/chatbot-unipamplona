@@ -38,7 +38,7 @@ class ChatBot:
             api_key=os.getenv('PINECONE_API_KEY'),
             environment='gcp-starter'
         )
-        self.index_name = "langchain-p3"
+        self.index_name = "langchain-p2"
 
         if self.index_name not in self.pc.list_indexes().names():
             self.pc.create_index(
