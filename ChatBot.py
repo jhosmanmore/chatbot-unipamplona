@@ -24,7 +24,7 @@ class ChatBot:
         # Carga de documento
         loader = TextLoader('documento.txt')
         documents = loader.load()
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=100)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1300, chunk_overlap=100)
         self.docs = text_splitter.split_documents(documents)
 
     # Cargar modelo de embedding
@@ -38,7 +38,7 @@ class ChatBot:
             api_key=os.getenv('PINECONE_API_KEY'),
             environment='gcp-starter'
         )
-        self.index_name = "langchain-p1"
+        self.index_name = "langchain-p2"
 
         if self.index_name not in self.pc.list_indexes().names():
             self.pc.create_index(
@@ -59,8 +59,8 @@ class ChatBot:
         repo_id = "meta-llama/Llama-3.2-3B-Instruct"
         self.llm = HuggingFaceEndpoint(
             repo_id=repo_id,
-            temperature=0.8,
-            top_k=50,
+            temperature=0.7,
+            top_k=30,
             #max_new_tokens=250,  # Limita las respuestas a 150 tokens.
             huggingfacehub_api_token=os.getenv('HUGGINGFACE_API_KEY')
         )
@@ -80,6 +80,7 @@ class ChatBot:
         - Si no puedes responder a algo específico, solo dí: "¿Tienes dudas?. Por favor contacta a un asesor de la Universidad de Pamplona para más información".
         - Si es necesario, refierete al "documento" como "reglamento académico estudiantil".
         - Si la pregunta no está relacionada con el contexto académico, responde únicamente con: "La pregunta está fuera del contexto académico disponible. Por favor, contacta directamente con un asesor de la Universidad de Pamplona para más información."
+        - Trata de ser breve en tu respuesta y sólo da la información que se te pregunta.
         - Limita tus respuestas a máximo 180 palabras y si el contexto incluye mucha información, realiza un resumen claro y directo con los puntos más relevantes para responder la pregunta, teniendo en cuenta el límite máximo de palabras.
         
         Contexto:
