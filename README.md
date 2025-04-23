@@ -55,7 +55,7 @@ Se implementaron dos métodos de evaluación:
 - Manual / subjetiva: con usuarios reales que valoraron usabilidad, coherencia y satisfacción general.
 
 # 📦 Instalación y uso local
-git clone https://github.com/usuario/ruleup-bot.git
+git clone [https://github.com/usuario/ruleup-bot.git](https://github.com/jhosmanmore/chatbot-unipamplona.git)
 cd ruleup-bot
 python3 -m venv .venv
 source .venv/bin/activate
